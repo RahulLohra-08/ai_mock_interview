@@ -18,7 +18,7 @@ interface FormFieldProps<T extends FieldValues> {
     type?: "text" | "email" | "password" | "file" | "number";
 }
 
-/* Cannot find name 'T'.ts(2304)
+/* Cannot find name 'T'.ts(2304)    
  type T = unresolved any
  */
 //Ans: ✅ Declare <T extends FieldValues> in the function itself

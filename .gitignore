@@ -20,8 +20,12 @@
 # production
 /build
 
-# Ignore Firebase service account key
-prepwise-firebase-adminsdk.json
+# Install filter-repo if not installed
+pip install git-filter-repo  # (or brew install git-filter-repo on Mac)
+
+# Remove the JSON from all past commits
+git filter-repo --path prepwise-firebase-adminsdk.json --invert-paths
+
 
 
 # misc

@@ -20,6 +20,10 @@
 # production
 /build
 
+# Ignore Firebase service account key
+prepwise-firebase-adminsdk.json
+
+
 # misc
 .DS_Store
 *.pem

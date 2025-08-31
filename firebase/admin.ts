@@ -9,10 +9,6 @@ const initFirebaseAdmin = () => {
     const apps = getApps();
     const privateKey = process.env.FIREBASE_PRIVATE_KEY;
 
-    console.log("ENV PROJECT_ID:", process.env.FIREBASE_PROJECT_ID);
-    console.log("ENV CLIENT_EMAIL:", process.env.FIREBASE_CLIENT_EMAIL);
-    console.log("ENV PRIVATE_KEY exists:", privateKey);
-
     if(!apps.length){
         if (!privateKey) {
            throw new Error("FIREBASE_PRIVATE_KEY is missing");

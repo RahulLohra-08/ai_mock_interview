@@ -15,7 +15,7 @@ import FormField from "./FormField"
 import { useRouter } from "next/navigation"
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth"
 import { auth } from "@/firebase/client"
-import { signUp } from "@/lib/auth.action"
+import { signIn, signUp } from "@/lib/auth.action"
 
 const authFormSchema = (type: FormType) => {
   return z.object({
@@ -70,12 +70,15 @@ const AuthForm = ({ type }: { type: FormType }) => {
 
         const idToken = await userCredentials.user.getIdToken();
 
+        // 👇 call your server action to set session cookie
+        const result = await signIn({ email, idToken });
+
         if(!idToken){
           toast.error("Signin failed, please try again");
           return;
         }
 
-        toast.success("Signed in successfully!");
+        toast.success(userCredentials.user.email + ` signed in successfully!`);
         // Redirect to home page after successful sign-in
         router.push("/");
       }

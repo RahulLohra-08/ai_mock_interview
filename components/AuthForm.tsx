@@ -13,6 +13,9 @@ import Link from "next/link"
 import { toast } from "sonner"
 import FormField from "./FormField"
 import { useRouter } from "next/navigation"
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth"
+import { auth } from "@/firebase/client"
+import { signUp } from "@/lib/auth.action"
 
 const authFormSchema = (type: FormType) => {
   return z.object({
@@ -38,16 +41,40 @@ const AuthForm = ({ type }: { type: FormType }) => {
   })
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     try {
       if(type === "sign-up") {
-        console.info("SIGN UP: ", values);
+        const { name, email, password } = values;
+        const userCredentials = await createUserWithEmailAndPassword(auth, email, password); //client ka denge.
+
+        const result = await signUp({
+          uid: userCredentials.user.uid,
+          name: name!, //typescript ko batana hai ki ye null nahi hoga
+          email,
+          password,
+        })  //server ka denge
+
+        if(!result?.success){
+          toast.error(result?.message);
+          return;
+        }
+
         toast.success("Account created successfully!");
         // Redirect to sign-in page after successful sign-up
         router.push("/sign-in");
       } else {
-        console.info("SIGN IN: ", values);
+
+        const { email, password } = values;
+        const userCredentials = await signInWithEmailAndPassword(auth, email, password);
+
+        const idToken = await userCredentials.user.getIdToken();
+
+        if(!idToken){
+          toast.error("Signin failed, please try again");
+          return;
+        }
+
         toast.success("Signed in successfully!");
         // Redirect to home page after successful sign-in
         router.push("/");
@@ -58,6 +85,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
     }
     // ✅ This will be type-safe and validated.
   }
+
 
   const isSignIn = type === "sign-in"
 

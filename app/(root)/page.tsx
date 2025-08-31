@@ -38,7 +38,7 @@ const Page = () => {
       <section className='flex flex-col gap-6 mt-8'>
         <h2>Take an Interviews</h2>
         <div className='interviews-section'>
-            { dummyInterviews.map((interview) => (
+            { dummyInterviews && dummyInterviews.map((interview) => (
             <InterviewCard {...interview} key={interview.id}/>
           ))}
           {/* <p>There are no interviews available</p> */}

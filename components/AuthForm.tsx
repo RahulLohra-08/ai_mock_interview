@@ -13,9 +13,9 @@ import Link from "next/link"
 import { toast } from "sonner"
 import FormField from "./FormField"
 import { useRouter } from "next/navigation"
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth"
+import {signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth"
 import { auth } from "@/firebase/client"
-import { signIn, signUp } from "@/lib/auth.action"
+import { signIn, signInWithGoogle, signUp } from "@/lib/auth.action"
 
 const authFormSchema = (type: FormType) => {
   return z.object({
@@ -48,6 +48,12 @@ const AuthForm = ({ type }: { type: FormType }) => {
         const { name, email, password } = values;
         const userCredentials = await createUserWithEmailAndPassword(auth, email, password); //client ka denge.
 
+        console.log("User credentials from Firebase:", userCredentials);
+        if(!userCredentials.user) {
+          toast.error("Signup failed, please try again");
+          return;
+        }
+        
         const result = await signUp({
           uid: userCredentials.user.uid,
           name: name!, //typescript ko batana hai ki ye null nahi hoga
@@ -55,6 +61,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
           password,
         })  //server ka denge
 
+        console.log("Sign-up result from server action:", result);
         if(!result?.success){
           toast.error(result?.message);
           return;
@@ -73,12 +80,22 @@ const AuthForm = ({ type }: { type: FormType }) => {
         // 👇 call your server action to set session cookie
         const result = await signIn({ email, idToken });
 
-        if(!idToken){
-          toast.error("Signin failed, please try again");
+        console.log("Sign-in result:", result);
+
+
+        // if(!idToken){
+        //   toast.error("Signin failed, please try again");
+        //   return;
+        // }
+
+        if (!result?.success) {
+          toast.error(result?.message);
           return;
         }
 
-        toast.success(userCredentials.user.email + ` signed in successfully!`);
+        toast.success(result.message);
+
+        // toast.success(userCredentials.user.email + ` signed in successfully!`);
         // Redirect to home page after successful sign-in
         router.push("/");
       }
@@ -88,6 +105,33 @@ const AuthForm = ({ type }: { type: FormType }) => {
     }
     // ✅ This will be type-safe and validated.
   }
+
+
+  //google login
+  const handleGoogleLogin = async () => {
+  try {
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+
+    const user = result.user;
+    const idToken = await user.getIdToken();
+
+    // Call your server action (same way you handle email sign-in)
+    const res = await signInWithGoogle({ idToken });
+    
+
+    if (!res?.success) {
+      toast.error(res?.message);
+      return;
+    }
+
+    toast.success("Signed in with Google!");
+    router.push("/");
+  } catch (error: any) {
+    console.error("Google login error:", error);
+    toast.error(error.message);
+  }
+};
 
 
   const isSignIn = type === "sign-in"
@@ -128,6 +172,17 @@ const AuthForm = ({ type }: { type: FormType }) => {
             <Button type="submit" className="btn">{isSignIn ? "Sign In" : "Create an Account"}</Button>
           </form>
         </Form>
+        { isSignIn && <Button
+            type="button"
+            variant="outline"
+            className="w-full flex items-center justify-center gap-2 mt-2"
+            onClick={handleGoogleLogin}
+          >
+            <Image src="/google.svg" alt="Google" width={20} height={20} />
+            Continue with Google
+          </Button>
+        }        {/* Link to switch between sign-in and sign-up */}
+
         <p className="text-center">
           {isSignIn ? "Not account yet?" : "Already have an account?"}{" "}
           <Link href={!isSignIn ? "/sign-in" : "/sign-up"} className="font-bold text-user-primary ml-1">{isSignIn ? "Sign Up" : "Sign In"}</Link>

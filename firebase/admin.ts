@@ -8,6 +8,9 @@ import { getFirestore } from 'firebase-admin/firestore';
 const initFirebaseAdmin = () => {
     const apps = getApps();
     const privateKey = process.env.FIREBASE_PRIVATE_KEY;
+    console.log("Firebase private key loaded:", !!privateKey);
+    console.log("Private key length:", process.env.FIREBASE_PRIVATE_KEY?.length);
+    console.log("Firebase client email:", process.env.FIREBASE_CLIENT_EMAIL ? "Loaded" : "Missing");
 
     if(!apps.length){
         if (!privateKey) {

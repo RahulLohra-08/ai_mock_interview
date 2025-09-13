@@ -7,6 +7,7 @@ import { isAuthenticated } from '@/lib/auth.action'
 const RootLayout = async ({ children } : { children: ReactNode}) => {
 
   const isUserAuthenticate = await isAuthenticated();  
+  console.log("Is user authenticated (layout)?", isUserAuthenticate);
 
   if(!isUserAuthenticate) {
     redirect('/sign-in');

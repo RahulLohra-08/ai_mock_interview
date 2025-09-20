@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { Mona_Sans } from "next/font/google";
 import "./globals.css";
 import { Toaster } from 'sonner' //allow user to showing toast for error and success
-import Link from "next/link";
-import Image from "next/image";
 
 const monaSans = Mona_Sans({
   variable: "--font-geist-sans",

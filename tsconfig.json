@@ -19,7 +19,7 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*", "./app/*", "./components/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.jsx", ".next/types/**/*.ts", "components/scrollStory/ParallaXNews.jsx", "utils/Hooks/useDimension.js"],
